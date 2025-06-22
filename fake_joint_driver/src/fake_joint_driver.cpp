@@ -79,6 +79,7 @@ FakeJointDriver::FakeJointDriver(void)
   }
   // Resize members
   cmd_dis.resize(joint_names_.size());
+  cmd_vel.resize(joint_names_.size());
   act_dis.resize(joint_names_.size());
   act_vel.resize(joint_names_.size());
   act_eff.resize(joint_names_.size());
@@ -107,9 +108,14 @@ FakeJointDriver::FakeJointDriver(void)
     // Connect and register the position_joint_interface
     hardware_interface::JointHandle pos_handle(joint_state_interface.getHandle(joint_names_[i]), &cmd_dis[i]);
     position_joint_interface.registerHandle(pos_handle);
+
+    // Connect and register the velocity_joint_interface
+    hardware_interface::JointHandle vel_handle(joint_state_interface.getHandle(joint_names_[i]), &cmd_vel[i]);
+    velocity_joint_interface.registerHandle(vel_handle);
   }
   registerInterface(&joint_state_interface);
   registerInterface(&position_joint_interface);
+  registerInterface(&velocity_joint_interface);
 }
 
 FakeJointDriver::~FakeJointDriver()
@@ -121,7 +127,17 @@ FakeJointDriver::~FakeJointDriver()
  */
 void FakeJointDriver::update(void)
 {
-  // only do loopback
-  act_dis = cmd_dis;
+  // Simple integration for velocity control
+  ros::Duration dt(0.001); // Assume 1ms update rate
+  for (size_t i = 0; i < joint_names_.size(); ++i) {
+    // Update position based on velocity command
+    act_dis[i] += cmd_vel[i] * dt.toSec();
+    act_vel[i] = cmd_vel[i];
+    
+    // Also support position loopback for compatibility
+    if (cmd_vel[i] == 0.0) {
+      act_dis[i] = cmd_dis[i];
+    }
+  }
 }
 

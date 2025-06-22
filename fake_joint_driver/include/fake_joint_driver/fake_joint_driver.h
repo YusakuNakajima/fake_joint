@@ -19,6 +19,7 @@ private:
   hardware_interface::VelocityJointInterface velocity_joint_interface;
 
   std::vector<double> cmd_dis;
+  std::vector<double> cmd_vel;
   std::vector<double> act_dis;
   std::vector<double> act_vel;
   std::vector<double> act_eff;
