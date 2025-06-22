@@ -130,13 +130,18 @@ void FakeJointDriver::update(void)
   // Simple integration for velocity control
   ros::Duration dt(0.001); // Assume 1ms update rate
   for (size_t i = 0; i < joint_names_.size(); ++i) {
-    // Update position based on velocity command
+    // Always integrate velocity commands
     act_dis[i] += cmd_vel[i] * dt.toSec();
     act_vel[i] = cmd_vel[i];
     
-    // Also support position loopback for compatibility
-    if (cmd_vel[i] == 0.0) {
-      act_dis[i] = cmd_dis[i];
+    // Only use position commands if there's no active velocity command
+    // This prevents position jumps when switching between controllers
+    if (std::abs(cmd_vel[i]) < 1e-6) {
+      // Only update from position command if it's significantly different
+      // This avoids sudden jumps to uninitialized values
+      if (std::abs(cmd_dis[i]) > 1e-6 && std::abs(cmd_dis[i] - act_dis[i]) > 0.1) {
+        act_dis[i] = cmd_dis[i];
+      }
     }
   }
 }
