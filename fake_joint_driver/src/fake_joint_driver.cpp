@@ -80,9 +80,23 @@ FakeJointDriver::FakeJointDriver(void)
   // Resize members
   cmd_dis.resize(joint_names_.size());
   cmd_vel.resize(joint_names_.size());
+  velocity_mode_active.resize(joint_names_.size());
+  last_cmd_vel.resize(joint_names_.size());
   act_dis.resize(joint_names_.size());
   act_vel.resize(joint_names_.size());
   act_eff.resize(joint_names_.size());
+
+  // Initialize all commands to zero
+  for (auto i=0; i<joint_names_.size(); i++)
+  {
+    cmd_dis[i] = 0.0;
+    cmd_vel[i] = 0.0;
+    velocity_mode_active[i] = false;
+    last_cmd_vel[i] = 0.0;
+    act_dis[i] = 0.0;
+    act_vel[i] = 0.0;
+    act_eff[i] = 0.0;
+  }
 
   // Set start position
   for (auto it=start_position_map.begin(); it!=start_position_map.end(); it++)
@@ -129,20 +143,31 @@ void FakeJointDriver::update(void)
 {
   // Simple integration for velocity control
   ros::Duration dt(0.001); // Assume 1ms update rate
+  
   for (size_t i = 0; i < joint_names_.size(); ++i) {
-    // Always integrate velocity commands
-    act_dis[i] += cmd_vel[i] * dt.toSec();
-    act_vel[i] = cmd_vel[i];
-    
-    // Only use position commands if there's no active velocity command
-    // This prevents position jumps when switching between controllers
-    if (std::abs(cmd_vel[i]) < 1e-6) {
-      // Only update from position command if it's significantly different
-      // This avoids sudden jumps to uninitialized values
-      if (std::abs(cmd_dis[i]) > 1e-6 && std::abs(cmd_dis[i] - act_dis[i]) > 0.1) {
-        act_dis[i] = cmd_dis[i];
-      }
+    // Check if velocity command has changed (indicating active velocity controller)
+    if (std::abs(cmd_vel[i] - last_cmd_vel[i]) > 1e-9 || std::abs(cmd_vel[i]) > 1e-9) {
+      velocity_mode_active[i] = true;
     }
+    
+    if (velocity_mode_active[i]) {
+      // Velocity control mode
+      act_dis[i] += cmd_vel[i] * dt.toSec();
+      act_vel[i] = cmd_vel[i];
+      
+      // If velocity is zero and stayed zero, prepare to switch to position mode
+      if (std::abs(cmd_vel[i]) < 1e-9 && std::abs(last_cmd_vel[i]) < 1e-9) {
+        // Update cmd_dis to current position to avoid jumps
+        cmd_dis[i] = act_dis[i];
+        velocity_mode_active[i] = false;
+      }
+    } else {
+      // Position control mode - use position command directly
+      act_dis[i] = cmd_dis[i];
+      act_vel[i] = 0.0;
+    }
+    
+    last_cmd_vel[i] = cmd_vel[i];
   }
 }
 

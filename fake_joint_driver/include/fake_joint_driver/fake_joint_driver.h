@@ -20,6 +20,8 @@ private:
 
   std::vector<double> cmd_dis;
   std::vector<double> cmd_vel;
+  std::vector<bool> velocity_mode_active;
+  std::vector<double> last_cmd_vel;
   std::vector<double> act_dis;
   std::vector<double> act_vel;
   std::vector<double> act_eff;
