@@ -1,10 +1,12 @@
 # fake_joint_driver
 
 This package contains a node to provide
-`hardware_interface::PositionJointInterface`, which simply loopback
-the command joint position to the actual position. In other words, it
+`hardware_interface::PositionJointInterface`, `hardware_interface::VelocityJointInterface`,
+and `hardware_interface::EffortJointInterface`, which simply loopback
+the command values to the actual feedback. In other words, it
 is faking a perfect joint controller. It can be used from
-ros_controllers such as JointTrajectoryController. You can check your
+ros_controllers such as JointTrajectoryController, position controllers,
+velocity controllers, and effort controllers. You can check your
 own joint trajectories on rviz, without using Gazebo or others.
 
 ![Screenshot](doc/fake_joint_driver.png)
@@ -23,7 +25,17 @@ This launch file does:
 
 1. Loading robot description of simple 3-DOF arm in robot/arm3.urdf.xacro
 2. Launching fake_joint_driver_node and robot_state_publisher
-3. Launching controller manager to spawn ros_controllers (joint_state_controller and joint_trajecotry_controller)
+3. Launching controller manager to spawn ros_controllers (joint_state_controller and joint_trajectory_controller)
+
+## Supported Controllers
+
+The fake_joint_driver supports the following controller types:
+
+- **Position Controllers**: `position_controllers/JointPositionController`, `position_controllers/JointTrajectoryController`
+- **Velocity Controllers**: `velocity_controllers/JointVelocityController`
+- **Effort Controllers**: `effort_controllers/JointEffortController`
+
+Example controller configurations can be found in the config files.
 
 ## See the robot in rviz 
 

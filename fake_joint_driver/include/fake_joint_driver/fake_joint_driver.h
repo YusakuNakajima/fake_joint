@@ -17,9 +17,11 @@ private:
   hardware_interface::JointStateInterface joint_state_interface;
   hardware_interface::PositionJointInterface position_joint_interface;
   hardware_interface::VelocityJointInterface velocity_joint_interface;
+  hardware_interface::EffortJointInterface effort_joint_interface;
 
   std::vector<double> cmd_dis;
   std::vector<double> cmd_vel;
+  std::vector<double> cmd_eff;
   std::vector<bool> velocity_mode_active;
   std::vector<double> last_cmd_vel;
   std::vector<double> act_dis;

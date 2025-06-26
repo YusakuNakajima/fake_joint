@@ -47,3 +47,63 @@ wrist_3_joint_position_controller:
   publish_rate: 50
   base_frame_id: base_link
   joint : wrist_3_joint
+
+shoulder_pan_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : shoulder_pan_joint
+
+shoulder_lift_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : shoulder_lift_joint
+
+elbow_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : elbow_joint
+
+wrist_1_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : wrist_1_joint
+
+wrist_2_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : wrist_2_joint
+
+wrist_3_joint_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  publish_rate: 50
+  joint : wrist_3_joint
+
+shoulder_pan_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : shoulder_pan_joint
+
+shoulder_lift_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : shoulder_lift_joint
+
+elbow_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : elbow_joint
+
+wrist_1_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : wrist_1_joint
+
+wrist_2_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : wrist_2_joint
+
+wrist_3_joint_effort_controller:
+  type: effort_controllers/JointEffortController
+  publish_rate: 50
+  joint : wrist_3_joint

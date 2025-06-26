@@ -80,6 +80,7 @@ FakeJointDriver::FakeJointDriver(void)
   // Resize members
   cmd_dis.resize(joint_names_.size());
   cmd_vel.resize(joint_names_.size());
+  cmd_eff.resize(joint_names_.size());
   velocity_mode_active.resize(joint_names_.size());
   last_cmd_vel.resize(joint_names_.size());
   act_dis.resize(joint_names_.size());
@@ -91,6 +92,7 @@ FakeJointDriver::FakeJointDriver(void)
   {
     cmd_dis[i] = 0.0;
     cmd_vel[i] = 0.0;
+    cmd_eff[i] = 0.0;
     velocity_mode_active[i] = false;
     last_cmd_vel[i] = 0.0;
     act_dis[i] = 0.0;
@@ -126,10 +128,15 @@ FakeJointDriver::FakeJointDriver(void)
     // Connect and register the velocity_joint_interface
     hardware_interface::JointHandle vel_handle(joint_state_interface.getHandle(joint_names_[i]), &cmd_vel[i]);
     velocity_joint_interface.registerHandle(vel_handle);
+
+    // Connect and register the effort_joint_interface
+    hardware_interface::JointHandle eff_handle(joint_state_interface.getHandle(joint_names_[i]), &cmd_eff[i]);
+    effort_joint_interface.registerHandle(eff_handle);
   }
   registerInterface(&joint_state_interface);
   registerInterface(&position_joint_interface);
   registerInterface(&velocity_joint_interface);
+  registerInterface(&effort_joint_interface);
 }
 
 FakeJointDriver::~FakeJointDriver()
@@ -166,6 +173,9 @@ void FakeJointDriver::update(void)
       act_dis[i] = cmd_dis[i];
       act_vel[i] = 0.0;
     }
+    
+    // Effort feedback - simply echo the effort command
+    act_eff[i] = cmd_eff[i];
     
     last_cmd_vel[i] = cmd_vel[i];
   }
