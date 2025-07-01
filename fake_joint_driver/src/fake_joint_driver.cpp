@@ -137,6 +137,8 @@ FakeJointDriver::FakeJointDriver(void)
   registerInterface(&position_joint_interface);
   registerInterface(&velocity_joint_interface);
   registerInterface(&effort_joint_interface);
+
+  last_update_time_ = ros::Time::now();
 }
 
 FakeJointDriver::~FakeJointDriver()
@@ -148,9 +150,12 @@ FakeJointDriver::~FakeJointDriver()
  */
 void FakeJointDriver::update(void)
 {
+  // Calculate time delta
+  ros::Time current_time = ros::Time::now();
+  ros::Duration dt = current_time - last_update_time_;
+  last_update_time_ = current_time;
+
   // Simple integration for velocity control
-  ros::Duration dt(0.001); // Assume 1ms update rate
-  
   for (size_t i = 0; i < joint_names_.size(); ++i) {
     // Check if velocity command has changed (indicating active velocity controller)
     if (std::abs(cmd_vel[i] - last_cmd_vel[i]) > 1e-9 || std::abs(cmd_vel[i]) > 1e-9) {

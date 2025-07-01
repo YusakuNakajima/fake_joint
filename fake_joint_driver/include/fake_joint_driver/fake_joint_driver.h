@@ -32,6 +32,7 @@ private:
   bool use_description_;
   std::vector<std::string> include_joints_;
   std::vector<std::string> exclude_joints_;
+  ros::Time last_update_time_;
 
 public:
   FakeJointDriver(void);
