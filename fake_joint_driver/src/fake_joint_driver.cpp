@@ -86,6 +86,7 @@ FakeJointDriver::FakeJointDriver(void)
   act_dis.resize(joint_names_.size());
   act_vel.resize(joint_names_.size());
   act_eff.resize(joint_names_.size());
+  last_position.resize(joint_names_.size());
 
   // Initialize all commands to zero
   for (auto i=0; i<joint_names_.size(); i++)
@@ -98,6 +99,7 @@ FakeJointDriver::FakeJointDriver(void)
     act_dis[i] = 0.0;
     act_vel[i] = 0.0;
     act_eff[i] = 0.0;
+    last_position[i] = 0.0;
   }
 
   // Set start position
@@ -109,6 +111,7 @@ FakeJointDriver::FakeJointDriver(void)
       {
         act_dis[i] = it->second;
         cmd_dis[i] = it->second;
+        last_position[i] = it->second;
       }
     }
   }
@@ -176,7 +179,13 @@ void FakeJointDriver::update(void)
     } else {
       // Position control mode - use position command directly
       act_dis[i] = cmd_dis[i];
-      act_vel[i] = 0.0;
+      // Calculate velocity from position difference
+      if (dt.toSec() > 0.0) {
+        act_vel[i] = (act_dis[i] - last_position[i]) / dt.toSec();
+      } else {
+        act_vel[i] = 0.0;
+      }
+      last_position[i] = act_dis[i];
     }
     
     // Effort feedback - simply echo the effort command

@@ -27,6 +27,7 @@ private:
   std::vector<double> act_dis;
   std::vector<double> act_vel;
   std::vector<double> act_eff;
+  std::vector<double> last_position;
 
   std::vector<std::string> joint_names_;
   bool use_description_;
